@@ -42,6 +42,14 @@ app.post('/api/shorturl', function( req , res ) {
         { error: 'invalid url' }
       );
     }
+
+    const exist = map.find(objeto => objeto.original_url === originalUrl);
+    if (undefined !== exist) {
+      return res.json(
+        exist
+      );
+    }
+
     map.push({ original_url: originalUrl, short_url: map.length + 1 })
 
     return res.json(
@@ -56,6 +64,16 @@ function getDomainFromUrl(urlString) {
     return urlObject.hostname;
   } catch (error) {
     console.error('Error: La URL proporcionada no es válida.');
-    return null; // O puedes lanzar una excepción aquí si prefieres manejar el error más adelante
+    return null; 
   }
 }
+
+app.get('/api/shorturl/:short_url', function( req , res ) {
+  let short_url = parseInt(req.params.short_url);
+  const objetoEncontrado = map.find(objeto => objeto.short_url === short_url);
+  if (undefined === objetoEncontrado) {
+    return res.redirect('/');
+  }
+
+  return res.redirect(objetoEncontrado.original_url);
+});
